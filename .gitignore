@@ -1,0 +1,23 @@
+# ── Fotos originales (76 MB). La página usa las optimizadas de assets/img ──
+/img/
+
+# ── Foto optimizada que ya no se usa en el catálogo ──
+/assets/img/conejo-portavela.webp
+
+# ── Documentación de uso local: GitHub Pages no la necesita ──
+/README.md
+
+# ── Configuración de herramientas / editor ──
+/.claude/
+.vscode/
+.idea/
+
+# ── Archivos del sistema ──
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# ── Temporales ──
+*.log
+*.tmp
+*.bak

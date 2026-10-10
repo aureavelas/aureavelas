@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Aurea · Velas aromáticas</title>
+  <meta name="description" content="Catálogo de Aurea: velas aromáticas artesanales para bautizos, baby showers, bodas, XV años y cualquier celebración especial.">
+  <meta name="theme-color" content="#f4f4f2">
+  <link rel="icon" href="assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="assets/img/favicon.png">
+
+  <meta property="og:title" content="Aurea · Velas aromáticas">
+  <meta property="og:description" content="Transformamos cera y aroma en un recuerdo encantador para tus invitados.">
+  <meta property="og:image" content="https://aureavelas/assets/img/favicon.png">
+  <meta property="og:url" content="https://aureavelas/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Jost:wght@300;400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/cart.css">
+</head>
+<body>
+  <a class="skip-link" href="#catalogo">Saltar al catálogo</a>
+
+  <!-- ───────── Encabezado ───────── -->
+  <header class="site-header" id="top">
+    <div class="wrap header-inner">
+      <a class="brand" href="#inicio" aria-label="Aurea, velas aromáticas — inicio">
+        <img src="assets/img/logo-sm.png" alt="" width="278" height="336">
+        <span class="brand-name">Aurea</span>
+      </a>
+
+      <nav class="site-nav" id="site-nav" aria-label="Principal">
+        <a href="#inicio">Inicio</a>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#personaliza">Colores y aromas</a>
+        <a href="#pedidos">Pedidos</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="cart-btn" type="button" id="cart-open" aria-label="Abrir carrito">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.3 8H6.2"/><circle cx="9.5" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>
+          <span class="cart-count" id="cart-count" hidden>0</span>
+        </button>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Abrir menú">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ───────── Bienvenida ───────── -->
+    <section class="hero" id="inicio">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Velas aromáticas</p>
+          <h1 class="script">¡Te damos la bienvenida!</h1>
+          <p class="hero-text">
+            Es un placer saludarte y qué alegría que nos hayas encontrado. En Aurea transformamos
+            cera y aroma en un recuerdo encantador para tus invitados. Si buscas un detalle único
+            para tu evento, estás en el lugar correcto.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#catalogo">Ver catálogo</a>
+            <a class="btn btn-ghost" href="#personaliza">Personaliza el tuyo</a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <img src="assets/img/logo.png" alt="" width="557" height="672" fetchpriority="high">
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Catálogo ───────── -->
+    <section class="catalog" id="catalogo" aria-labelledby="catalogo-titulo">
+      <div class="wrap">
+        <header class="section-head">
+          <h2 class="script" id="catalogo-titulo">Nuestro catálogo</h2>
+          <p>Nuestro menú de personalización: elige tu figura favorita y combínala con el color y aroma que más te guste.</p>
+        </header>
+      </div>
+
+      <div class="toolbar">
+        <div class="wrap toolbar-inner">
+          <div class="chips" id="category-chips" role="group" aria-label="Filtrar por categoría"></div>
+          <div class="toolbar-tools">
+            <label class="search">
+              <span class="visually-hidden">Buscar producto</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+              <input type="search" id="search" placeholder="Buscar…" autocomplete="off">
+            </label>
+            <label class="sort">
+              <span class="visually-hidden">Ordenar por</span>
+              <select id="sort">
+                <option value="featured">Destacados</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
+                <option value="name">Nombre (A–Z)</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <p class="season-banner" id="season-banner" hidden></p>
+        <p class="result-count" id="result-count" aria-live="polite"></p>
+        <div class="grid" id="grid"></div>
+        <div class="empty" id="empty" hidden>
+          <p class="script">Sin resultados</p>
+          <p>No encontramos productos con esa búsqueda. Prueba con otra palabra o elige otra categoría.</p>
+          <button class="btn btn-ghost" type="button" id="reset-filters">Ver todo el catálogo</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Colores y aromas ───────── -->
+    <section class="custom" id="personaliza" aria-labelledby="personaliza-titulo">
+      <div class="wrap">
+        <header class="section-head">
+          <h2 class="script" id="personaliza-titulo">Haz la tuya</h2>
+          <p>Cada vela se personaliza: elige el color y el aroma que combine con tu evento.</p>
+        </header>
+
+        <div class="custom-grid">
+          <div class="panel">
+            <h3 class="script">Colores a elegir</h3>
+            <ul class="swatches" id="colors"></ul>
+          </div>
+          <div class="panel">
+            <h3 class="script">Aromas disponibles</h3>
+            <ul class="aromas" id="aromas"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Condiciones de venta ───────── -->
+    <section class="terms" id="pedidos" aria-labelledby="pedidos-titulo">
+      <div class="wrap">
+        <header class="section-head">
+          <h2 class="script" id="pedidos-titulo">Condiciones de venta</h2>
+          <p>Políticas de pedido</p>
+        </header>
+
+        <ol class="steps">
+          <li>
+            <span class="step-n">1</span>
+            <h3>Con anticipación</h3>
+            <p>En pedidos de <strong>15 piezas o más</strong>, se requiere un mínimo de <strong>2 semanas</strong> de anticipación.</p>
+          </li>
+          <li>
+            <span class="step-n">2</span>
+            <h3>Depósito del 50%</h3>
+            <p>Se requiere un depósito del <strong>50%</strong> para comenzar la producción.</p>
+          </li>
+          <li>
+            <span class="step-n">3</span>
+            <h3>Liquidación en la entrega</h3>
+            <p>El pedido se liquida totalmente al momento de la entrega.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <img src="assets/img/logo-sm.png" alt="Aurea, velas aromáticas" width="278" height="336" loading="lazy">
+      <p class="script">Cera y aroma hechos recuerdo</p>
+      <div class="footer-links" id="footer-contact"></div>
+      <p class="fine">© <span id="year"></span> Aurea · Velas aromáticas</p>
+    </div>
+  </footer>
+
+  <a class="to-top" href="#top" aria-label="Volver arriba">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>
+  </a>
+
+  <!-- ───────── Detalle de producto ───────── -->
+  <dialog class="modal" id="product-modal" aria-labelledby="modal-title">
+    <div class="modal-body" id="modal-body"></div>
+  </dialog>
+
+  <!-- ───────── Carrito ───────── -->
+  <dialog class="drawer" id="cart-drawer" aria-labelledby="cart-title">
+    <div class="drawer-inner">
+      <header class="drawer-head">
+        <h2 class="script" id="cart-title">Tu carrito</h2>
+        <button class="icon-btn" type="button" data-cart="close" aria-label="Cerrar carrito">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+      <div class="drawer-body" id="cart-body"></div>
+      <footer class="drawer-foot" id="cart-foot"></footer>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
