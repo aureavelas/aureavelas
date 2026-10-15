@@ -173,6 +173,9 @@
     if (r.pres) {
       blocks.push(`<fieldset class="opt"><legend>Presentación</legend><div class="pills">${pillsHTML('pres', r.pres, false)}</div></fieldset>`);
     }
+    if (p.choice) {
+      blocks.push(`<fieldset class="opt"><legend>${esc(p.choice.label)}</legend><div class="pills">${pillsHTML('choice', p.choice.options, false)}</div></fieldset>`);
+    }
     if (r.basket) {
       blocks.push(`<fieldset class="opt"><legend>Colores del arreglo</legend><div class="pills">${pillsHTML('mode', [SOLO, MULTI], false)}</div></fieldset>`);
       blocks.push(`<fieldset class="opt" id="solo-colors" hidden><legend>¿De qué color? <small>(opcional)</small></legend><div class="swatch-grid">${COLORS.map((c) => swatchHTML('radio', c)).join('')}</div></fieldset>`);
@@ -265,12 +268,14 @@
       id: current.id,
       qty: clampQty(data.get('qty')),
       pres: data.get('pres') || '',
+      choice: data.get('choice') || '',
       mode: data.get('mode') || '',
       colors: data.getAll('color'),
       aromas: data.getAll('aroma'),
     };
     const maxAromas = +f.dataset.maxAromas;
     if (f.dataset.pres === 'true' && !item.pres) return showOrderError('Elige la presentación de tu vela.');
+    if (current.choice && !item.choice) return showOrderError(`Elige la ${current.choice.label.toLowerCase()} de tu vela.`);
     if (f.dataset.basket === 'true' && !item.mode) return showOrderError('Elige si tu canasta será de un solo color o de distintos colores.');
     if (maxColors && !item.colors.length) return showOrderError(maxColors > 1 ? 'Elige al menos un color.' : 'Elige un color para tu vela.');
     if (maxAromas && !item.aromas.length) return showOrderError(maxAromas > 1 ? 'Elige al menos un aroma (máximo 2).' : 'Elige un aroma para tu vela.');
@@ -450,7 +455,7 @@
     }
     function save() { try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (_) { /* sin almacenamiento */ } }
 
-    const keyOf = (i) => [i.id, i.pres || '', (i.colors || []).join('+'), i.mode || '', (i.aromas || []).join('+')].join('|');
+    const keyOf = (i) => [i.id, i.pres || '', i.choice || '', (i.colors || []).join('+'), i.mode || '', (i.aromas || []).join('+')].join('|');
     const count = () => items.reduce((n, i) => n + i.qty, 0);
     const total = () => items.reduce((s, i) => s + byId(i.id).price * i.qty, 0);
 
@@ -462,7 +467,7 @@
       let color = colors.join(' + ');
       if (i.mode === MULTI) color = MULTI;
       else if (i.mode === SOLO) color = colors[0] || SOLO;
-      return { color, pres: i.pres || '', aroma: (i.aromas || []).join(' - ') };
+      return { color, pres: i.pres || '', choice: i.choice || '', aroma: (i.aromas || []).join(' - ') };
     }
 
     const SEP = '———————————————————';
@@ -474,6 +479,7 @@
         `* Modelo: ${byId(i.id).name}`,
         d.color && `* Color: ${d.color}`,
         d.pres && `* Presentación: ${d.pres}`,
+        d.choice && `* ${byId(i.id).choice.label}: ${d.choice}`,
         d.aroma && `* Aroma: ${d.aroma}`,
       ].filter(Boolean);
     }
@@ -504,7 +510,7 @@
       bodyEl.innerHTML = `<ul class="cart-list">${items.map((i, n) => {
         const p = byId(i.id);
         const d = detail(i);
-        const sub = [d.color, d.pres, d.aroma].filter(Boolean).join(' · ');
+        const sub = [d.color, d.pres, d.choice, d.aroma].filter(Boolean).join(' · ');
         return `<li class="cart-item">
           <img src="${esc(p.gallery[0].src)}" alt="" width="72" height="72" loading="lazy">
           <div class="cart-info">

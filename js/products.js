@@ -154,12 +154,12 @@ const PRODUCTS = [
     gallery: [g('regalo-flores', 'Bolsita')],
   },
   {
-    id: 'bolso-floral', cat: 'canastas', name: 'Bolso floral', price: 150, dummy: true,
+    id: 'bolso-floral', cat: 'canastas', name: 'Bolso floral', price: 170, dummy: true,
     desc: 'Elegante bolso rosa con cadena dorada, lleno de girasoles, flores y detalles de cera. Un regalo para lucirse en cumpleaños, aniversarios o el Día de las Madres.',
     gallery: [g('bolso-flores', 'Bolso')],
   },
   {
-    id: 'aro-de-luz-floral', cat: 'canastas', name: 'Aro de luz floral', price: 450, dummy: true,
+    id: 'aro-de-luz-floral', cat: 'canastas', name: 'Aro de luz floral', price: 130, dummy: true,
     desc: 'Aro luminoso con luces cálidas y arreglo floral en la base. Una pieza decorativa para mesas de dulces, bodas, XV años o sesiones de fotos.',
     gallery: [g('arreglo-aro', 'Arreglo')],
   },
@@ -177,7 +177,7 @@ const PRODUCTS = [
     gallery: [g('cruzsola', 'Blanca')],
   },
   {
-    id: 'virgen-guadalupe', cat: 'fe', name: 'Virgen con porta flores', price: 85, dummy: true,
+    id: 'virgen-guadalupe', cat: 'fe', name: 'Virgen con porta flores', price: 45, dummy: true,
     desc: 'Vela de la Virgen sobre una base redonda acompañada de pequeñas velitas en forma de flor. Disponible en rosa, lila y turquesa.',
     gallery: [g('virgen1', 'Rosa suave'), g('virgen2', 'Rosa'), g('virgen3', 'Turquesa')],
   },
@@ -185,6 +185,17 @@ const PRODUCTS = [
     id: 'angel-corazon', cat: 'fe', name: 'Ángel de la guarda', price: 40, dummy: true,
     desc: 'Vela en forma de ángel con corazón calado en el pecho. Un detalle protector para bautizos, bienvenida de bebé o primera comunión.',
     gallery: [g('angel', 'Blanco')],
+  },
+  {
+    id: 'cruz-bautizo', cat: 'fe', name: 'Cruz Cristo', price: 40,
+    desc: 'Cruz de cera con Cristo en relieve rodeado de rosas y contorno plateado. Un recuerdo elegante para bautizo, primera comunión o boda.',
+    gallery: [g('cruz-bautizo', 'Cruz')],
+  },
+  {
+    id: 'cruz-silueta', cat: 'fe', name: 'Cruz con silueta', price: 35,
+    desc: 'Cruz de cera con la silueta de un niño o una niña en oración. Un recuerdo tierno para bautizo o primera comunión.',
+    choice: { label: 'Silueta', options: ['Niño', 'Niña'] },
+    gallery: [g('cruz-silueta', 'Cruz', true)],
   },
 
   /* ───────────── TEMPORADA · DÍA DE MUERTOS / HALLOWEEN (relleno) ───────────── */
@@ -199,7 +210,7 @@ const PRODUCTS = [
     gallery: [g('calavera-alebrije', 'Calaveras')],
   },
   {
-    id: 'cruz-dia-de-muertos', cat: 'temporada', name: 'Cruz con nombre', price: 70, dummy: true,
+    id: 'cruz-dia-de-muertos', cat: 'temporada', name: 'Cruz con nombre', price: 40, dummy: true,
     desc: 'Cruz de cera personalizada con el nombre de tu ser querido y flores de cempasúchil. Ideal para tu altar de Día de Muertos.',
     gallery: [g('cruz-ddm', 'Personalizada'), g('cruces-ddm', 'Tres nombres')],
   },
@@ -243,7 +254,7 @@ const PRODUCTS = [
 
   /* ───────────── AROMATIZANTES (relleno) ───────────── */
   {
-    id: 'aromatizantes', cat: 'aromas', name: 'Aromatizantes en lata', price: 60, dummy: true,
+    id: 'aromatizantes', cat: 'aromas', name: 'Aromatizantes en lata', price: 80, dummy: true,
     desc: 'Cera aromática en forma de corazones en latita con tapa calada. Perfuma tus espacios en cualquiera de nuestros aromas.',
     gallery: [g('aromatizantes', 'Latas')],
   },
@@ -328,6 +339,8 @@ const SIZES = {
   'angel-corazon': '8 cm x 10 cm',
   'calaveritas-de-colores': '4 cm x 5 cm',
   'calaveras-alebrije': '5 cm x 5 cm',
+  'cruz-bautizo': '10 cm x 7 cm',
+  'cruz-silueta': '10 cm x 7 cm',
   'cruz-dia-de-muertos': '6 cm x 10 cm',
   'caldero-encantado': '15 cm x 20 cm',
   'osito-calabaza': '5 cm x 6 cm',
