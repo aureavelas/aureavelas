@@ -56,7 +56,7 @@ const PRODUCTS = [
 
   /* ───────────── ANIMALITOS (relleno) ───────────── */
   {
-    id: 'leoncito', cat: 'animalitos', name: 'Leoncito melena', price: 40, dummy: true,
+    id: 'leoncito', cat: 'animalitos', name: 'Leoncito melena', price: 30, dummy: true,
     desc: 'Vela en forma de leoncito de melena suave y mirada dulce. Disponible en varios colores, ideal para baby shower, cumpleaños o como detalle de bienvenida.',
     presentations: [{ name: 'Tul', text: TXT_TUL }],
     gallery: [g('leon', 'Vela'), g('leon-tul', 'Tul'), g('leones', 'Colores')],
@@ -300,7 +300,7 @@ const CART_RULES = {
 const SEASONAL = {
   categories: ['temporada'],
   badge: 'De temporada',
-  note: 'Edición de temporada · disponible solo por tiempo limitado',
+  note: 'Edición de temporada · disponible solo por el mes de octubre',
   banner: 'Estas velas son de temporada y estarán disponibles solo por tiempo limitado. ¡Pídelas antes de que se acaben!',
 };
 
