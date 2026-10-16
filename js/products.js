@@ -276,6 +276,19 @@ const AROMAS = [
   'Moka Café', 'Algodón de Azúcar', 'Gardenia Floral', 'Naranja Radiante',
 ];
 
+/* Tipos de evento para la etiqueta personalizada (en el carrito se agrega "Otro" al final).
+   names = cómo se pide el nombre para ese evento */
+const EVENT_TYPES = [
+  { name: 'Boda',             names: 'Nombre de los novios' },
+  { name: 'XV años',          names: 'Nombre de la quinceañera' },
+  { name: 'Bautizo',          names: 'Nombre del bebé (o bebés)' },
+  { name: 'Cumpleaños',       names: 'Nombre del festejado (o festejados)' },
+  { name: 'Baby shower',      names: 'Nombre del bebé (o bebés)' },
+  { name: 'Primera comunión', names: 'Nombre del niño o niña (o niños)' },
+];
+/* Para "Otro" o mientras no eligen evento */
+const EVENT_NAMES_DEFAULT = 'Nombre(s) de la persona';
+
 /* Datos de contacto: déjalos vacíos ('') para ocultar el botón */
 const CONTACT = {
   whatsapp: '522229609468',   // solo números con lada, ej. '5215512345678'

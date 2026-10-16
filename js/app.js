@@ -313,6 +313,7 @@
           ${isSeasonal(p) ? `<p class="season-note"><span aria-hidden="true">✦</span> ${esc(SEASONAL.note)}</p>` : ''}
           <p class="detail-desc">${esc(p.desc)}</p>
           ${SIZES[p.id] ? `<p class="size-line"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16 12-12 4 4L8 20l-4-4Z"/><path d="m7 13 2 2m1-5 2 2m1-5 2 2"/></svg><span>Tamaño:</span> <strong>${esc(SIZES[p.id])}</strong></p>` : ''}
+          <p class="size-line label-line"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l9 9-8 8-9-9Z"/><circle cx="7.5" cy="8.5" r="1.5"/></svg><span>Incluye <strong>etiqueta personalizada</strong>; los datos los capturas al finalizar tu pedido en el carrito.</span></p>
           ${orderHTML(p)}
           ${inc}${pres}
           <div class="detail-actions"><button class="btn btn-ghost" type="button" data-action="close">Seguir viendo</button></div>
@@ -453,7 +454,126 @@
         return Array.isArray(raw) ? raw.filter((i) => byId(i.id) && i.qty > 0) : [];
       } catch (_) { return []; }
     }
-    function save() { try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (_) { /* sin almacenamiento */ } }
+
+    // Etiqueta personalizada: opcional; una para todo el pedido o una por producto (en items[n].label)
+    const LABEL_KEY = 'aurea-label-v1';
+    const OTRO = 'Otro';
+    const blankLabel = () => ({ type: '', other: '', names: '', date: '' });
+    const defaultLabel = () => ({ on: false, same: true, all: blankLabel() });
+    let label = loadLabel();
+
+    function loadLabel() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(LABEL_KEY));
+        if (raw && typeof raw === 'object') return { on: !!raw.on, same: raw.same !== false, all: { ...blankLabel(), ...raw.all } };
+      } catch (_) { /* sin almacenamiento */ }
+      return defaultLabel();
+    }
+
+    function save() {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(items));
+        localStorage.setItem(LABEL_KEY, JSON.stringify(label));
+      } catch (_) { /* sin almacenamiento */ }
+    }
+
+    const perItem = () => label.on && !label.same && items.length > 1;
+    const labelOf = (scope) => (scope === 'all' ? label.all : (items[scope].label = { ...blankLabel(), ...items[scope].label }));
+    const eventOf = (l) => (l.type === OTRO ? l.other.trim() : l.type);
+    const namesLabel = (type) => (EVENT_TYPES.find((t) => t.name === type) || {}).names || EVENT_NAMES_DEFAULT;
+    const fmtDate = (iso) => { const [y, m, d] = iso.split('-'); return iso ? `${d}/${m}/${y}` : ''; };
+    const labelText = (l) => [eventOf(l), l.names.trim(), fmtDate(l.date)].filter(Boolean).join(' · ');
+
+    function todayISO() {
+      const t = new Date();
+      return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+    }
+
+    // Aviso (no bloquea) si la fecha del evento no alcanza el tiempo de las condiciones de venta
+    function leadWarning(l) {
+      if (!l.date) return '';
+      const [y, m, d] = l.date.split('-').map(Number);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const days = Math.round((new Date(y, m - 1, d) - today) / 86400000);
+      if (days < 0) return 'La fecha del evento ya pasó; revisa que sea correcta.';
+      const pieces = count();
+      const need = pieces >= 15 ? 14 : pieces >= 10 ? 3 : 0;
+      if (days >= need) return '';
+      const when = days === 0 ? 'hoy' : days === 1 ? 'mañana' : `en ${days} días`;
+      const time = need === 14 ? '2 semanas de anticipación' : '3 días de producción';
+      return `Tu evento es ${when}; para un pedido de ${pieces} piezas necesitamos al menos ${time}. Escríbenos para confirmar disponibilidad.`;
+    }
+
+    function updateWarnings() {
+      $$('.label-fields', bodyEl).forEach((box) => {
+        const el = $('.label-warn', box);
+        el.textContent = leadWarning(labelOf(box.dataset.scope));
+        el.hidden = !el.textContent;
+      });
+    }
+
+    function labelFieldsHTML(scope) {
+      const l = labelOf(scope);
+      const id = `lbl-${scope}`;
+      return `<div class="label-fields" data-scope="${scope}">
+          <label class="field" for="${id}-type"><span>Tipo de evento</span>
+            <select id="${id}-type" data-label="type">
+              <option value="">Elige el evento…</option>
+              ${[...EVENT_TYPES.map((t) => t.name), OTRO].map((t) => `<option${t === l.type ? ' selected' : ''}>${esc(t)}</option>`).join('')}
+            </select></label>
+          <label class="field" for="${id}-other" data-other${l.type === OTRO ? '' : ' hidden'}><span>¿Qué evento?</span>
+            <input id="${id}-other" type="text" data-label="other" value="${esc(l.other)}" maxlength="40" autocomplete="off"></label>
+          <label class="field" for="${id}-names"><span data-names-label>${esc(namesLabel(l.type))}</span>
+            <input id="${id}-names" type="text" data-label="names" value="${esc(l.names)}" maxlength="60" autocomplete="off"></label>
+          <label class="field" for="${id}-date"><span>Fecha del evento</span>
+            <input id="${id}-date" type="date" data-label="date" value="${esc(l.date)}" min="${todayISO()}"></label>
+          <p class="label-warn" role="status" hidden></p>
+        </div>`;
+    }
+
+    function labelBoxHTML() {
+      const many = items.length > 1;
+      let fields = '';
+      if (label.on && perItem()) {
+        fields = items.map((i, n) => {
+          const d = detail(i);
+          const sub = [d.color, d.pres, d.choice].filter(Boolean).join(' · ');
+          return `<div class="label-item">
+            <p class="label-item-name">${esc(byId(i.id).name)} ×${i.qty}${sub ? `<small>${esc(sub)}</small>` : ''}</p>
+            ${labelFieldsHTML(n)}</div>`;
+        }).join('');
+      } else if (label.on) {
+        fields = labelFieldsHTML('all');
+      }
+      return `<section class="label-box" aria-label="Etiqueta personalizada">
+          <label class="check-row"><input type="checkbox" data-label-opt="on"${label.on ? ' checked' : ''}><span>Agregar etiqueta personalizada</span></label>
+          ${label.on && many ? `<label class="check-row"><input type="checkbox" data-label-opt="same"${label.same ? ' checked' : ''}><span>Usar la misma etiqueta para todo el pedido</span></label>` : ''}
+          ${fields}
+        </section>`;
+    }
+
+    // Si eligieron etiqueta, todos sus campos son obligatorios
+    function checkLabels() {
+      if (!label.on) return true;
+      const missing = $$('.label-fields', bodyEl).flatMap((box) => {
+        const l = labelOf(box.dataset.scope);
+        return [['type', !l.type], ['other', l.type === OTRO && !l.other.trim()], ['names', !l.names.trim()], ['date', !l.date]]
+          .filter(([, bad]) => bad).map(([k]) => $(`[data-label="${k}"]`, box));
+      });
+      if (!missing.length) return true;
+      missing.forEach((el) => el.setAttribute('aria-invalid', 'true'));
+      showError('Completa los datos de la etiqueta: tipo de evento, nombre(s) y fecha.');
+      missing[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+      missing[0].focus({ preventScroll: true });
+      return false;
+    }
+
+    function showError(msg) {
+      const el = $('#cart-error', footEl);
+      if (!el) return;
+      el.textContent = msg;
+      el.hidden = !msg;
+    }
 
     const keyOf = (i) => [i.id, i.pres || '', i.choice || '', (i.colors || []).join('+'), i.mode || '', (i.aromas || []).join('+')].join('|');
     const count = () => items.reduce((n, i) => n + i.qty, 0);
@@ -486,7 +606,9 @@
 
     function message() {
       const out = ['Hola Aurea, me gustaría hacer el siguiente pedido:', '', SEP];
-      items.forEach((i) => out.push('', ...block(i), '', SEP));
+      const each = perItem();
+      items.forEach((i, n) => out.push('', ...block(i), ...(each ? [`* Etiqueta: ${labelText(labelOf(n))}`] : []), '', SEP));
+      if (!each) out.push('', `Etiqueta: ${label.on ? labelText(label.all) : 'SIN ETIQUETA PERSONALIZADA'}`);
       out.push('', `Total: ${money(total())}`);
       return out.join('\n');
     }
@@ -527,13 +649,15 @@
           </div>
           <p class="cart-price">${money(p.price * i.qty)}</p>
         </li>`;
-      }).join('')}</ul>`;
+      }).join('')}</ul>
+      ${labelBoxHTML()}`;
+      updateWarnings();
 
-      const href = `https://wa.me/${CONTACT.whatsapp || ''}?text=${encodeURIComponent(message())}`;
       footEl.innerHTML = `
         <div class="cart-total"><span>Total</span><strong>${money(total())}</strong></div>
         <p class="cart-note">Al enviar el pedido se abre WhatsApp con tu lista; ahí confirmamos disponibilidad, fecha de entrega y el depósito del 50%.</p>
-        <a class="btn btn-primary btn-block" href="${href}" target="_blank" rel="noopener">Enviar pedido por WhatsApp</a>
+        <p class="order-error" id="cart-error" role="alert" hidden></p>
+        <button class="btn btn-primary btn-block" type="button" data-cart="send">Enviar pedido por WhatsApp</button>
         <button class="link-btn" type="button" data-cart="clear">Vaciar carrito</button>`;
     }
 
@@ -553,10 +677,61 @@
         case 'inc': items[n].qty = Math.min(99, items[n].qty + 1); break;
         case 'dec': items[n].qty = Math.max(1, items[n].qty - 1); break;
         case 'remove': items.splice(n, 1); break;
-        case 'clear': if (confirm('¿Vaciar todo el carrito?')) items = []; break;
+        case 'clear': if (confirm('¿Vaciar todo el carrito?')) { items = []; label = defaultLabel(); } break;
+        case 'send': if (checkLabels()) openTerms(); return;
         default: return;
       }
       save(); render();
+    });
+
+    drawer.addEventListener('change', (e) => {
+      const opt = e.target.dataset.labelOpt;
+      if (!opt) return;
+      label[opt] = e.target.checked;
+      // Al separar etiquetas, cada producto empieza con los datos de la etiqueta común
+      if (opt === 'same' && !label.same) {
+        items.forEach((i, n) => { if (!labelText(labelOf(n))) i.label = { ...label.all }; });
+      }
+      save(); render();
+      if (opt === 'on' && label.on) $('.label-box', bodyEl).scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+
+    function onLabelInput(e) {
+      const field = e.target.dataset.label;
+      if (!field) return;
+      const box = e.target.closest('.label-fields');
+      labelOf(box.dataset.scope)[field] = e.target.value;
+      if (field === 'type') {
+        $('[data-other]', box).hidden = e.target.value !== OTRO;
+        $('[data-names-label]', box).textContent = namesLabel(e.target.value);
+      }
+      e.target.removeAttribute('aria-invalid');
+      showError('');
+      save(); updateWarnings();
+    }
+    drawer.addEventListener('input', onLabelInput);
+    drawer.addEventListener('change', onLabelInput);
+
+    // Condiciones de venta: el enlace a WhatsApp se habilita al aceptarlas.
+    const terms = $('#terms-dialog');
+    const termsAccept = $('#terms-accept');
+    const termsSend = $('#terms-send');
+
+    function syncTerms() { termsSend.setAttribute('aria-disabled', String(!termsAccept.checked)); }
+    function openTerms() {
+      termsSend.href = `https://wa.me/${CONTACT.whatsapp || ''}?text=${encodeURIComponent(message())}`;
+      termsAccept.checked = false;
+      syncTerms();
+      if (!terms.open) terms.showModal();
+    }
+
+    termsAccept.addEventListener('change', syncTerms);
+    terms.addEventListener('click', (e) => {
+      if (e.target === terms || e.target.closest('[data-terms="close"]')) return terms.close();
+      if (e.target.closest('#terms-send')) {
+        if (!termsAccept.checked) return e.preventDefault();
+        terms.close();
+      }
     });
     $('#cart-open').addEventListener('click', open);
     badge();
